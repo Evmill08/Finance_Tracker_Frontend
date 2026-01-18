@@ -1,19 +1,18 @@
-import { AuthResponse } from "@/models/AuthResponse";
+import { AuthApiResponse } from "@/models/AuthResponse";
+import {BASE_URL} from "config";
 
-// TODO: Check this
-const BASE_URL = "http://localhost:1433";
-
-export async function post<T extends AuthResponse>(
+export async function post<T extends AuthApiResponse<T>>(
     path: string,
     body: any,
     token?: string
 ) : Promise<T> {
+
     const headers: HeadersInit = {
         "Content-Type": "application/json",
     };
 
     if (token){
-         headers['Authorization'] = `Bearer ${token}`;
+        headers['Authorization'] = `Bearer ${token}`;
     }
 
     const response = await fetch(`${BASE_URL}${path}`, {
@@ -28,5 +27,6 @@ export async function post<T extends AuthResponse>(
     }
 
     const data: T = await response.json();
+    console.log("data:", JSON.stringify(data));
     return data;
 }

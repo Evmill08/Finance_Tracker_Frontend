@@ -3,15 +3,21 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, KeyboardAvoidingView, Platform, View, Text, TextInput, TouchableOpacity} from "react-native";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     
     const handleLogin = async () => {
         console.log("Logging in with: ", email, password);
         const response = await login(email, password);
         console.log(response);
+
+        if (response.success){
+            console.log("Successful login");
+        }
     }
 
     const handleForgotPassword = () => {
@@ -41,13 +47,28 @@ export default function LoginScreen() {
                         onChangeText={setEmail}
                     />
 
-                    {/* TODO: Use something to get the little eye icon here to show password */}
-                    <TextInput style={styles.input}
-                        placeholder="Password"
-                        secureTextEntry
-                        value={password}
-                        onChangeText={setPassword}
-                    />
+                    <View style={styles.inputContainer}>
+                        <TextInput style={styles.passwordInput}
+                            placeholder="Password"
+                            secureTextEntry={!isPasswordVisible} 
+                            autoCapitalize="none"
+                            textContentType="password"
+                            value={password}
+                            onChangeText={setPassword}
+                        />
+
+                        <TouchableOpacity 
+                            style={styles.passwordVisibilityButton} 
+                            onPress={() => setIsPasswordVisible(prev => !prev)}
+                            hitSlop={10}
+                        >
+                            <Ionicons
+                                name={isPasswordVisible ? "eye" : "eye-off"}
+                                size={20}
+                                color="#666"
+                            />
+                        </TouchableOpacity>
+                    </View>
 
                     <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={!email || ! password}>
                         <Text style={styles.buttonText}>Login</Text>
@@ -125,5 +146,32 @@ const styles = StyleSheet.create({
         color: "#2D3047",
         textAlign: "center",
         marginTop: 12
-    }
+    },
+
+    inputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 8,
+        height: 48,
+        marginBottom: 8,
+    },
+
+    passwordInput: {
+        flex: 1,
+        paddingHorizontal: 12,
+        height: "100%",
+    },
+
+    passwordVisibilityButton: {
+        paddingHorizontal: 12,
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+    },
+
+    passwordVisibilityIcon: {
+        fontSize: 18,
+    },
 })

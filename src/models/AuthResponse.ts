@@ -1,6 +1,6 @@
-export interface AuthResponse{
+export interface AuthApiResponse<T>{
     success: boolean;
-    token?: string;
+    data: T;
     errorMessage?: string;
 }
 

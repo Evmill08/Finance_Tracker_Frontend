@@ -12,6 +12,7 @@ export default function SignupScreen() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [error, setError] = useState("");
 
     const isPasswordValid = PASSWORD_REQUIREMENTS.every(req => req.isValid(password));
 
@@ -20,14 +21,18 @@ export default function SignupScreen() {
         const response = await signup(email, password);
         console.log(response);
 
-        // TODO: Call email service
+        if (response.success){
+            router.replace({pathname: "./verify-email", params: {email}});
+        } else{
+            setError(response.errorMessage ?? "Error signing up");
+        }
     }
 
     const handleNaviateLogin = () => {
         router.replace("./login");
     }
 
-    // TODO: Add some kind of scroll feature to aviod confirm 
+    // TODO: Add some kind of scroll feature to avoid confirm being off screen
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
@@ -63,7 +68,7 @@ export default function SignupScreen() {
                             hitSlop={10}
                         >
                             <Ionicons
-                                name={isPasswordVisible ? "eye-off" : "eye"}
+                                name={isPasswordVisible ? "eye" : "eye-off"}
                                 size={20}
                                 color="#666"
                             />
