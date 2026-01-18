@@ -15,11 +15,15 @@ export async function post<T extends AuthApiResponse<T>>(
         headers['Authorization'] = `Bearer ${token}`;
     }
 
+    console.log("Hitting: ", `${BASE_URL}${path}`);
+    console.log("with body: ", JSON.stringify(body));
     const response = await fetch(`${BASE_URL}${path}`, {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
     });
+
+    console.log("response from post: ", JSON.stringify(response));
 
     if (!response.ok){
         const text = await response.text();

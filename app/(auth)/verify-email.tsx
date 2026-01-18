@@ -9,6 +9,9 @@ export default function verifyEmailScreen() {
     const [verificationMessage, setVerificationMessage] = useState("");
     const {email} = useLocalSearchParams<{email: string}>();
 
+
+    // TODO: If having trouble with sql, dont be an idiot, make sure to actually start and connect to the server
+
     const handleVerifyEmail = async () => {
         const response = await verifyEmail(email, verificationCode);
         console.log("Response from verify email: ", JSON.stringify(response));
@@ -67,19 +70,29 @@ export default function verifyEmailScreen() {
 
 const styles = StyleSheet.create({
     safeArea: {
-
+        flex: 1,
+        backgroundColor: "#fff"
     },
 
     container: {
-
+        flex: 1,
+        justifyContent: "center",
+        paddingHorizontal: 24
     },
 
     title: {
-
+        fontSize: 28,
+        fontWeight: "600",
+        marginBottom: 32,
+        textAlign: "center"
     },
 
     input: {
-
+        height: 48,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 8,
+        paddingHorizontal: 12
     },
 
     verificationMessage: {
@@ -87,7 +100,12 @@ const styles = StyleSheet.create({
     },
 
     verifyButton: {
-
+        backgroundColor: "#2D3047",
+        height: 48,
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 8
     },
 
     resendButton: {
@@ -95,14 +113,14 @@ const styles = StyleSheet.create({
     },
 
     buttonText: {
-
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "600"
     },
 
     linkText: {
-
-    }
-
-
-
-
+        color: "#2D3047",
+        textAlign: "center",
+        marginTop: 12
+    },
 })

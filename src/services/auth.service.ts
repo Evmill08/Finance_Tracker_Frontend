@@ -11,8 +11,9 @@ export async function signup(email: string, password: string): Promise<AuthApiRe
     return post<AuthApiResponse<any>>('/auth/signup', {email, password});
 }
 
-export async function verifyEmail(verificationCode: string, verificationToken: string): Promise<AuthApiResponse<any>> {
-    return post<AuthApiResponse<any>>('/auth/verify-email', {verificationCode, verificationToken});
+export async function verifyEmail(email: string, verificationCode: string): Promise<AuthApiResponse<any>> {
+    console.log("hit verify email")
+    return post<AuthApiResponse<any>>('/auth/verify-email', {email, verificationCode});
 }
 
 export async function resendVerificationEmail(verificationToken: string) {
