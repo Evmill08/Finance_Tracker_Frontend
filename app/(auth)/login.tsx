@@ -8,6 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginScreen() {
+    console.log("here");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -25,7 +26,7 @@ export default function LoginScreen() {
     }
 
     const handleForgotPassword = () => {
-
+        router.replace("/(auth)/forgotPassword");
     }
 
     const handleNaviateSignup = () => {

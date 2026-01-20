@@ -43,3 +43,11 @@
 // const styles = StyleSheet.create({
 
 // })
+
+export default function HomeScreen() {
+    console.log("WHy are we here part 2")
+    
+    return (
+        {}
+    )
+}

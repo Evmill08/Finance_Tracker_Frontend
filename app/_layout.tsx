@@ -1,40 +1,31 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Redirect, router, Slot, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from '@/providers/AuthProvider';
-import { useAuth } from '@/hooks/use-auth';
-import 'react-native-reanimated';
-
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Stack } from 'expo-router';
 
-function Gate(){
-  const {token, user, loading} = useAuth();
-
-  if (loading){
-    return null; // Probably a splash screen later
-  }
-
-  if (!token){
-    router.replace("./login")
-  }
-
-  if (!user?.hasLinkedPlaid){
-    router.replace("./link-bank");
-  }
-
-  return <Slot/>
-}
-
-export default function RootLayout() {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const colorScheme = useColorScheme();
 
+  console.log("were in root layout");
+
+  // return (
+  //   <AuthProvider>
+  //     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+  //       {children}
+  //       <StatusBar style="auto" />
+  //     </ThemeProvider>
+  //   </AuthProvider>
+  // );
   return (
     <AuthProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Gate/>
+        <Stack>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(app)" />
+        </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
     </AuthProvider>
-    
-  );
+  );  
 }

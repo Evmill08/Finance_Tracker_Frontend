@@ -19,7 +19,8 @@ export default function verifyEmailScreen() {
 
         if (response.success) {
             const jwt = response.data as string;
-            await setTokenFromVerification(jwt)
+            await setTokenFromVerification(jwt);
+            router.replace("/(app)/link-bank");
         } else {
             setVerificationMessage(response.errorMessage ?? "Invalid Code");
         }

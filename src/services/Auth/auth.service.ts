@@ -22,9 +22,9 @@ export async function resendVerificationEmail<T>(verificationToken: string) {
 }
 
 export async function requestPasswordReset<T>(email: string){
-    return post<T>('auth/request-password-reset', {email});
+    return post<T>('/auth/request-password-reset', {email});
 }
 
 export async function confirmPaswordReset<T>(email: string, verificationCode: string, newPassword: string){
-    return post<T>('auth/confirm-password-reset', {email, verificationCode, newPassword});
+    return post<T>('/auth/confirm-password-reset', {email, verificationCode, newPassword});
 }

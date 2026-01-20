@@ -11,6 +11,7 @@ type AuthContextType = {
     setTokenFromVerification: (jwt: string) => Promise<void>;
 }
 
+// TODO: Get this working more
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: {children: ReactNode}) {
@@ -27,6 +28,8 @@ export function AuthProvider({ children }: {children: ReactNode}) {
   async function loadAuth(){
     try{
         const storedToken = await SecureStore.getItemAsync("jwt");
+
+        console.log("Were in the auth provider");
 
         if (!storedToken){
             setLoading(false);

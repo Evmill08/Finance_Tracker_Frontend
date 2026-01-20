@@ -1,12 +1,11 @@
 import { signup } from "@/services/Auth/auth.service";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, KeyboardAvoidingView, Platform, View, Text, TextInput, TouchableOpacity} from "react-native";
+import { StyleSheet, KeyboardAvoidingView, Platform, View, Text, TextInput, TouchableOpacity, ScrollView} from "react-native";
 import { router } from "expo-router";
 import { validateEmail, validatePassword, validatePasswordMatch } from "@/services/Auth/authValidation";
 import { PASSWORD_REQUIREMENTS } from "@/utils/passwordRequirements";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView } from "react-native-reanimated/lib/typescript/Animated";
 
 export default function SignupScreen() {
     const [email, setEmail] = useState("");
@@ -52,7 +51,7 @@ export default function SignupScreen() {
                             placeholder="First Name"
                             autoCapitalize="none"
                             keyboardType="email-address"
-                            value={email}
+                            value={firstName}
                             onChangeText={setFirstName}
                         />
 
@@ -60,7 +59,7 @@ export default function SignupScreen() {
                             placeholder="Last Name"
                             autoCapitalize="none"
                             keyboardType="email-address"
-                            value={email}
+                            value={lastName}
                             onChangeText={setLastName}
                         />
 
