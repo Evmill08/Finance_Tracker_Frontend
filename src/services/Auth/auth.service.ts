@@ -16,6 +16,15 @@ export async function verifyEmail<T>(email: string, verificationCode: string): P
     return post<T>('/auth/verify-email', {email, verificationCode});
 }
 
+// TODO: This needs to be fleshed out/thought about
 export async function resendVerificationEmail<T>(verificationToken: string) {
     return post<T>('/auth/resend-verification', {verificationToken});
+}
+
+export async function requestPasswordReset<T>(email: string){
+    return post<T>('auth/request-password-reset', {email});
+}
+
+export async function confirmPaswordReset<T>(email: string, verificationCode: string, newPassword: string){
+    return post<T>('auth/confirm-password-reset', {email, verificationCode, newPassword});
 }

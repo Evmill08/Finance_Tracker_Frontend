@@ -44,6 +44,7 @@ export default function verifyEmailScreen() {
             >
                 <Text style={styles.title}>Email Verification sent to your email</Text>
 
+                {/*TODO:  Can easily turn this into a component to use for this and password reset */}
                 <View style={styles.container}>
                     <TextInput style={styles.input}
                         keyboardType="number-pad"

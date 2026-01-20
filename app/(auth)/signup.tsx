@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { validateEmail, validatePassword, validatePasswordMatch } from "@/services/Auth/authValidation";
 import { PASSWORD_REQUIREMENTS } from "@/utils/passwordRequirements";
 import { Ionicons } from "@expo/vector-icons";
+import { ScrollView } from "react-native-reanimated/lib/typescript/Animated";
 
 export default function SignupScreen() {
     const [email, setEmail] = useState("");
@@ -41,98 +42,102 @@ export default function SignupScreen() {
                 style={styles.container}
                 behavior={Platform.OS === "ios" ? "padding" : undefined}
             >
-                <Text style={styles.title}>Signup</Text>
+                <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
+                    <Text style={styles.title}>Signup</Text>
 
-                {/*TODO: Move email and password input containers to a component to use in both login and signup
-                The email input container should have a red error show up underneath when the email is invalid. Disappear when valid */}
-                <View style={styles.container}>
-                    <TextInput style={styles.input}
-                        placeholder="First Name"
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                        value={email}
-                        onChangeText={setFirstName}
-                    />
-
-                    <TextInput style={styles.input}
-                        placeholder="Last Name"
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                        value={email}
-                        onChangeText={setLastName}
-                    />
-
-                    <TextInput style={styles.input}
-                        placeholder="Email"
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                        value={email}
-                        onChangeText={setEmail}
-                    />
-
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.passwordInput}
-                            placeholder="Password"
-                            secureTextEntry={!isPasswordVisible} 
+                    {/*TODO: Move email and password input containers to a component to use in both login and signup
+                    The email input container should have a red error show up underneath when the email is invalid. Disappear when valid */}
+                    <View style={styles.container}>
+                        <TextInput style={styles.input}
+                            placeholder="First Name"
                             autoCapitalize="none"
-                            textContentType="password"
-                            value={password}
-                            onChangeText={setPassword}
+                            keyboardType="email-address"
+                            value={email}
+                            onChangeText={setFirstName}
                         />
 
-                        <TouchableOpacity 
-                            style={styles.passwordVisibilityButton} 
-                            onPress={() => setIsPasswordVisible(prev => !prev)}
-                            hitSlop={10}
-                        >
-                            <Ionicons
-                                name={isPasswordVisible ? "eye" : "eye-off"}
-                                size={20}
-                                color="#666"
+                        <TextInput style={styles.input}
+                            placeholder="Last Name"
+                            autoCapitalize="none"
+                            keyboardType="email-address"
+                            value={email}
+                            onChangeText={setLastName}
+                        />
+
+                        <TextInput style={styles.input}
+                            placeholder="Email"
+                            autoCapitalize="none"
+                            keyboardType="email-address"
+                            value={email}
+                            onChangeText={setEmail}
+                        />
+
+                        <View style={styles.inputContainer}>
+                            <TextInput style={styles.passwordInput}
+                                placeholder="Password"
+                                secureTextEntry={!isPasswordVisible} 
+                                autoCapitalize="none"
+                                textContentType="password"
+                                value={password}
+                                onChangeText={setPassword}
                             />
+
+                            <TouchableOpacity 
+                                style={styles.passwordVisibilityButton} 
+                                onPress={() => setIsPasswordVisible(prev => !prev)}
+                                hitSlop={10}
+                            >
+                                <Ionicons
+                                    name={isPasswordVisible ? "eye" : "eye-off"}
+                                    size={20}
+                                    color="#666"
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* TODO: Animate checkmark and X's */}
+                        <View style={styles.passwordConstraintsContainer}>
+                            <Text style={styles.passwordConstraintsTitle}>Password must include: </Text>
+                            {PASSWORD_REQUIREMENTS.map((req) => {
+                                const satisfied = req.isValid(password);
+
+                                return (
+                                    <View key={req.id} style={styles.passwordRequirementRow}>
+                                        <Text style={[styles.passwordRequirementIcon, satisfied ? styles.valid: styles.invalid]}>
+                                            {satisfied ? "✓" : "✕"}
+                                        </Text>
+
+                                        <Text style={[styles.passwordRequirementText, satisfied ? styles.valid : styles.invalid]}>
+                                            {req.label}
+                                        </Text>
+                                    </View>
+                                );
+                            })}
+                        </View>
+
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.passwordInput}
+                                placeholder="Confirm Password"
+                                secureTextEntry={!isPasswordVisible}
+                                autoCapitalize="none"
+                                textContentType="password"
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
+                            />
+                        </View>          
+
+                        <TouchableOpacity style={styles.loginButton} onPress={handleSignup} disabled={!validateEmail(email) || !isPasswordValid || !validatePasswordMatch(password, confirmPassword)}>
+                            <Text style={styles.buttonText}>Signup</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={handleNaviateLogin}>
+                            <Text style={styles.navigateLogin}>Already have an account?</Text>
                         </TouchableOpacity>
                     </View>
 
-                    {/* TODO: Animate checkmark and X's */}
-                    <View style={styles.passwordConstraintsContainer}>
-                        <Text style={styles.passwordConstraintsTitle}>Password must include: </Text>
-                        {PASSWORD_REQUIREMENTS.map((req) => {
-                            const satisfied = req.isValid(password);
-
-                            return (
-                                <View key={req.id} style={styles.passwordRequirementRow}>
-                                    <Text style={[styles.passwordRequirementIcon, satisfied ? styles.valid: styles.invalid]}>
-                                        {satisfied ? "✓" : "✕"}
-                                    </Text>
-
-                                    <Text style={[styles.passwordRequirementText, satisfied ? styles.valid : styles.invalid]}>
-                                        {req.label}
-                                    </Text>
-                                </View>
-                            );
-                        })}
-                    </View>
-
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.passwordInput}
-                            placeholder="Confirm Password"
-                            secureTextEntry={!isPasswordVisible}
-                            autoCapitalize="none"
-                            textContentType="password"
-                            value={confirmPassword}
-                            onChangeText={setConfirmPassword}
-                        />
-                    </View>          
-
-                    <TouchableOpacity style={styles.loginButton} onPress={handleSignup} disabled={!validateEmail(email) || !isPasswordValid || !validatePasswordMatch(password, confirmPassword)}>
-                        <Text style={styles.buttonText}>Signup</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={handleNaviateLogin}>
-                        <Text style={styles.navigateLogin}>Already have an account?</Text>
-                    </TouchableOpacity>
-                </View>
+                </ScrollView>
+                
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
