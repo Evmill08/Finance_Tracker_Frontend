@@ -1,22 +1,26 @@
-import { login } from "@/services/auth.service";
+import { login } from "@/services/Auth/auth.service";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, KeyboardAvoidingView, Platform, View, Text, TextInput, TouchableOpacity} from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import * as SecureStore from 'expo-secure-store';
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const {setTokenFromVerification} = useAuth();
     
     const handleLogin = async () => {
-        console.log("Logging in with: ", email, password);
         const response = await login(email, password);
-        console.log(response);
 
         if (response.success){
-            console.log("Successful login");
+            const jwt = response.data as string;
+            await setTokenFromVerification(jwt);
+        } else {
+            throw new Error(response.errorMessage);
         }
     }
 

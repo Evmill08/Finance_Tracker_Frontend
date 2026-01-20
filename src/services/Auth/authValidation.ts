@@ -3,11 +3,6 @@ export function validateEmail(email: string): boolean {
     return EMAIL_REGEX.test(email.trim());
 }
 
-interface passwordError {
-    id: number;
-    error: string;
-}
-
 export function validatePassword(password: string): number[] {
     const passwordErrors: number[] = [];
 

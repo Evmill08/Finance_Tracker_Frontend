@@ -1,24 +1,40 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Redirect, router, Slot, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { AuthProvider } from '@/providers/AuthProvider';
+import { useAuth } from '@/hooks/use-auth';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+function Gate(){
+  const {token, user, loading} = useAuth();
+
+  if (loading){
+    return null; // Probably a splash screen later
+  }
+
+  if (!token){
+    router.replace("./login")
+  }
+
+  if (!user?.hasLinkedPlaid){
+    router.replace("./link-bank");
+  }
+
+  return <Slot/>
+}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(app)" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Gate/>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </AuthProvider>
+    
   );
 }

@@ -1,23 +1,25 @@
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAvoidingView, StyleSheet, Platform, View, Text, TextInput, TouchableOpacity } from "react-native";
-import { verifyEmail, resendVerificationEmail } from "@/services/auth.service";
+import { verifyEmail, resendVerificationEmail } from "@/services/Auth/auth.service";
 import { router, useLocalSearchParams } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
+import { useAuth } from "@/hooks/use-auth";
 
 export default function verifyEmailScreen() {
     const [verificationCode, setVerificationCode] = useState("");
     const [verificationMessage, setVerificationMessage] = useState("");
     const {email} = useLocalSearchParams<{email: string}>();
+    const {setTokenFromVerification} = useAuth();
 
 
     // TODO: If having trouble with sql, dont be an idiot, make sure to actually start and connect to the server
-
     const handleVerifyEmail = async () => {
         const response = await verifyEmail(email, verificationCode);
-        console.log("Response from verify email: ", JSON.stringify(response));
 
         if (response.success) {
-            router.push('./(tabs');
+            const jwt = response.data as string;
+            await setTokenFromVerification(jwt)
         } else {
             setVerificationMessage(response.errorMessage ?? "Invalid Code");
         }

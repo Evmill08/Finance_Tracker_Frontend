@@ -1,9 +1,9 @@
-import { signup } from "@/services/auth.service";
+import { signup } from "@/services/Auth/auth.service";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, KeyboardAvoidingView, Platform, View, Text, TextInput, TouchableOpacity} from "react-native";
 import { router } from "expo-router";
-import { validateEmail, validatePassword, validatePasswordMatch } from "@/services/authValidation";
+import { validateEmail, validatePassword, validatePasswordMatch } from "@/services/Auth/authValidation";
 import { PASSWORD_REQUIREMENTS } from "@/utils/passwordRequirements";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -12,13 +12,15 @@ export default function SignupScreen() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [error, setError] = useState("");
 
     const isPasswordValid = PASSWORD_REQUIREMENTS.every(req => req.isValid(password));
 
     const handleSignup = async () => {
         console.log("Signup up in with: ", email, password);
-        const response = await signup(email, password);
+        const response = await signup(email, password, firstName, lastName);
         console.log(response);
 
         if (response.success){
@@ -44,6 +46,22 @@ export default function SignupScreen() {
                 {/*TODO: Move email and password input containers to a component to use in both login and signup
                 The email input container should have a red error show up underneath when the email is invalid. Disappear when valid */}
                 <View style={styles.container}>
+                    <TextInput style={styles.input}
+                        placeholder="First Name"
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        value={email}
+                        onChangeText={setFirstName}
+                    />
+
+                    <TextInput style={styles.input}
+                        placeholder="Last Name"
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        value={email}
+                        onChangeText={setLastName}
+                    />
+
                     <TextInput style={styles.input}
                         placeholder="Email"
                         autoCapitalize="none"

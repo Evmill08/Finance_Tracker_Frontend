@@ -1,11 +1,11 @@
-import { AuthApiResponse } from "@/models/AuthResponse";
+import { ApiResponse } from "@/models/AuthResponse";
 import {BASE_URL} from "config";
 
-export async function post<T extends AuthApiResponse<T>>(
+export async function post<T>(
     path: string,
     body: any,
     token?: string
-) : Promise<T> {
+) : Promise<ApiResponse<T>> {
 
     const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -30,7 +30,5 @@ export async function post<T extends AuthApiResponse<T>>(
         throw new Error(`HTTP ${response.status}: ${text}`);
     }
 
-    const data: T = await response.json();
-    console.log("data:", JSON.stringify(data));
-    return data;
+    return await response.json()
 }
