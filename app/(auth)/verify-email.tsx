@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { KeyboardAvoidingView, StyleSheet, Platform, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, Platform, View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { verifyEmail, resendVerificationEmail } from "@/services/Auth/auth.service";
 import { router, useLocalSearchParams } from "expo-router";
-import * as SecureStore from 'expo-secure-store';
 import { useAuth } from "@/hooks/use-auth";
 
 export default function verifyEmailScreen() {
@@ -18,11 +17,11 @@ export default function verifyEmailScreen() {
         const response = await verifyEmail(email, verificationCode);
 
         if (response.success) {
-            const jwt = response.data as string;
-            await setTokenFromVerification(jwt);
+            const JwtToken = response.data as string;
+            await setTokenFromVerification(JwtToken);
             router.replace("/(app)/link-bank");
         } else {
-            setVerificationMessage(response.errorMessage ?? "Invalid Code");
+            setVerificationMessage(response.errorMessage ?? "Invalid Verification Code");
         }
     }
 
@@ -37,94 +36,146 @@ export default function verifyEmailScreen() {
     //     }
     // }
 
+    const handleNavigateSignup = () => {
+        router.replace("/(auth)/signup");
+    }
+
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView
-                style={styles.container}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
+          <Text style={styles.title}>Verify Your Email</Text>
+
+          <View style={styles.section}>
+            <Text style={styles.description}>
+              We sent a 6-digit verification code to:
+            </Text>
+
+            <Text style={styles.email}>{email}</Text>
+
+            <TextInput
+              style={styles.codeInput}
+              placeholder="e.g. 123456"
+              keyboardType="number-pad"
+              maxLength={6}
+              value={verificationCode}
+              onChangeText={setVerificationCode}
+            />
+
+            {verificationMessage && (
+              <Text style={styles.message}>{verificationMessage}</Text>
+            )}
+
+            <TouchableOpacity
+              style={[
+                styles.button,
+                verificationCode.length < 6 && styles.disabledButton,
+              ]}
+              onPress={handleVerifyEmail}
+              disabled={verificationCode.length < 6}
             >
-                <Text style={styles.title}>Email Verification sent to your email</Text>
+              <Text style={styles.buttonText}>Verify Email</Text>
+            </TouchableOpacity>
 
-                {/*TODO:  Can easily turn this into a component to use for this and password reset */}
-                <View style={styles.container}>
-                    <TextInput style={styles.input}
-                        keyboardType="number-pad"
-                        maxLength={6}
-                        autoCapitalize="none"
-                        value={verificationCode}
-                        onChangeText={setVerificationCode}
-                    />
+            <TouchableOpacity style={styles.resendButton}>
+              <Text style={styles.linkText}>Resend Code</Text>
+            </TouchableOpacity>
 
-                    <Text style={styles.verificationMessage}>{verificationMessage}</Text>
-
-                    <TouchableOpacity style={styles.verifyButton} onPress={handleVerifyEmail} disabled={verificationCode.length < 6}>
-                        <Text style={styles.buttonText}>Verify</Text>
-                    </TouchableOpacity>
-
-
-                    <TouchableOpacity style={styles.resendButton}>
-                        <Text style={styles.linkText}>Resend Code</Text>
-                    </TouchableOpacity>
-                </View>
-
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-    )
+            <TouchableOpacity style={styles.resendButton} onPress={handleNavigateSignup}>
+              <Text style={styles.linkText}>Return to Signup</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: "#fff"
-    },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
 
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        paddingHorizontal: 24
-    },
+  container: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
 
-    title: {
-        fontSize: 28,
-        fontWeight: "600",
-        marginBottom: 32,
-        textAlign: "center"
-    },
+  section: {
+    marginBottom: 32,
+  },
 
-    input: {
-        height: 48,
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 8,
-        paddingHorizontal: 12
-    },
+  title: {
+    fontSize: 28,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 16,
+  },
 
-    verificationMessage: {
+  description: {
+    fontSize: 14,
+    color: "#555",
+    textAlign: "center",
+    marginBottom: 4,
+  },
 
-    },
+  email: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#2D3047",
+    textAlign: "center",
+    marginBottom: 20,
+  },
 
-    verifyButton: {
-        backgroundColor: "#2D3047",
-        height: 48,
-        borderRadius: 8,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 8
-    },
+  codeInput: {
+    height: 48,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 12,
+    textAlign: "center",
+    fontSize: 18,
+    letterSpacing: 4,
+  },
 
-    resendButton: {
+  message: {
+    textAlign: "center",
+    marginBottom: 12,
+    color: "#a02626",
+    fontWeight: "500",
+  },
 
-    },
+  button: {
+    backgroundColor: "#7981c0",
+    height: 48,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 2,
+  },
 
-    buttonText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600"
-    },
+  disabledButton: {
+    opacity: 0.6,
+  },
 
-    linkText: {
-        color: "#2D3047",
-        textAlign: "center",
-        marginTop: 12
-    },
-})
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  resendButton: {
+    marginTop: 12,
+  },
+
+  linkText: {
+    color: "#7981c0",
+    textAlign: "center",
+    fontSize: 16,
+  },
+});

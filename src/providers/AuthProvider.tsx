@@ -8,7 +8,7 @@ type AuthContextType = {
     user: User | null;
     loading: boolean;
     refreshUser: () => Promise<void>;
-    setTokenFromVerification: (jwt: string) => Promise<void>;
+    setTokenFromVerification: (JwtToken: string) => Promise<void>;
 }
 
 // TODO: Get this working more
@@ -19,15 +19,16 @@ export function AuthProvider({ children }: {children: ReactNode}) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  async function setTokenFromVerification(jwt: string){
-    await SecureStore.setItemAsync("jwt", jwt);
-    setToken(jwt);
+  // TODO: Should probably change (JSON web token Token) in FE and BE
+  async function setTokenFromVerification(JwtToken: string){
+    await SecureStore.setItemAsync("JwtToken", JwtToken);
+    setToken(JwtToken);
     await refreshUser();
   }
 
   async function loadAuth(){
     try{
-        const storedToken = await SecureStore.getItemAsync("jwt");
+        const storedToken = await SecureStore.getItemAsync("JwtToken");
 
         console.log("Were in the auth provider");
 
@@ -43,7 +44,7 @@ export function AuthProvider({ children }: {children: ReactNode}) {
         if (response.success){
             setUser(response.data as User);
         } else {
-            await SecureStore.deleteItemAsync("jwt");
+            await SecureStore.deleteItemAsync("JwtToken");
             setToken(null);
             setUser(null);
         }

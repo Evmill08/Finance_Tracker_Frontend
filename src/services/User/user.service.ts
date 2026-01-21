@@ -6,5 +6,5 @@ import * as SecureStore from 'expo-secure-store';
 // Make sure our backend is accepting this
 export async function getUserInformation<T>(jwt: string): Promise<ApiResponse<T>> {
     console.log("Hitting me endpoint");
-    return await post<T>('/user-information', {jwt});
+    return await post<T>('/user-information', null, jwt);
 }

@@ -17,8 +17,8 @@ export default function LoginScreen() {
         const response = await login(email, password);
 
         if (response.success){
-            const jwt = response.data as string;
-            await setTokenFromVerification(jwt);
+            const JwtToken = response.data as string;
+            await setTokenFromVerification(JwtToken);
             router.replace("./(app)"); // TODO: Figure this out
         } else {
             throw new Error(response.errorMessage);

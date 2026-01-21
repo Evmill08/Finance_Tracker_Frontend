@@ -65,42 +65,48 @@ export default function ForgotPasswordScreen() {
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
           <Text style={styles.title}>Forgot Password</Text>
+
           {message && <Text style={styles.message}>{message}</Text>}
 
           {showEmailInput && (
             <View style={styles.section}>
               <Text style={styles.description}>
-                Enter your email address to receive a password reset code
+                Enter your email address and we’ll send you a verification code
               </Text>
 
               <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder="Email address"
                 autoCapitalize="none"
                 keyboardType="email-address"
                 value={email}
                 onChangeText={handleSetEmail}
               />
 
-              {emailError && (
-                <Text style={styles.invalidEmail}>{emailError}</Text>
-              )}
-              
+              {emailError && <Text style={styles.error}>{emailError}</Text>}
+
               <TouchableOpacity
-                style={[styles.button, !validateEmail(email) && styles.disabledButton]}
+                style={[
+                  styles.button,
+                  !validateEmail(email) && styles.disabledButton,
+                ]}
                 onPress={handleSendVerificationEmail}
                 disabled={!validateEmail(email)}
               >
-                <Text style={styles.buttonText}>Get Code</Text>
+                <Text style={styles.buttonText}>Send Code</Text>
               </TouchableOpacity>
             </View>
           )}
 
           {showCodeInput && (
             <View style={styles.section}>
+              <Text style={styles.description}>
+                Enter the verification code and choose a new password
+              </Text>
+
               <TextInput
-                style={styles.input}
-                placeholder="Verification Code"
+                style={styles.codeInput}
+                placeholder="e.g. 123456"
                 keyboardType="number-pad"
                 maxLength={6}
                 value={verificationCode}
@@ -113,14 +119,12 @@ export default function ForgotPasswordScreen() {
                   placeholder="New Password"
                   secureTextEntry={!isPasswordVisible}
                   autoCapitalize="none"
-                  textContentType="password"
                   value={newPassword}
                   onChangeText={setNewPassword}
                 />
                 <TouchableOpacity
                   style={styles.passwordVisibilityButton}
                   onPress={() => setIsPasswordVisible(prev => !prev)}
-                  hitSlop={10}
                 >
                   <Ionicons
                     name={isPasswordVisible ? "eye" : "eye-off"}
@@ -131,15 +135,28 @@ export default function ForgotPasswordScreen() {
               </View>
 
               <View style={styles.passwordConstraintsContainer}>
-                <Text style={styles.passwordConstraintsTitle}>Password must include:</Text>
-                {PASSWORD_REQUIREMENTS.map((req) => {
+                <Text style={styles.passwordConstraintsTitle}>
+                  Password must include:
+                </Text>
+
+                {PASSWORD_REQUIREMENTS.map(req => {
                   const satisfied = req.isValid(newPassword);
                   return (
                     <View key={req.id} style={styles.passwordRequirementRow}>
-                      <Text style={[styles.passwordRequirementIcon, satisfied ? styles.valid : styles.invalid]}>
+                      <Text
+                        style={[
+                          styles.passwordRequirementIcon,
+                          satisfied ? styles.valid : styles.invalid,
+                        ]}
+                      >
                         {satisfied ? "✓" : "✕"}
                       </Text>
-                      <Text style={[styles.passwordRequirementText, satisfied ? styles.valid : styles.invalid]}>
+                      <Text
+                        style={[
+                          styles.passwordRequirementText,
+                          satisfied ? styles.valid : styles.invalid,
+                        ]}
+                      >
                         {req.label}
                       </Text>
                     </View>
@@ -153,7 +170,6 @@ export default function ForgotPasswordScreen() {
                   placeholder="Confirm Password"
                   secureTextEntry={!isPasswordVisible}
                   autoCapitalize="none"
-                  textContentType="password"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                 />
@@ -162,11 +178,15 @@ export default function ForgotPasswordScreen() {
               <TouchableOpacity
                 style={[
                   styles.button,
-                  (!validateEmail(email) || !isPasswordValid || !validatePasswordMatch(newPassword, confirmPassword)) &&
+                  (!isPasswordValid ||
+                    !validatePasswordMatch(newPassword, confirmPassword)) &&
                     styles.disabledButton,
                 ]}
                 onPress={handleResetPassword}
-                disabled={!validateEmail(email) || !isPasswordValid || !validatePasswordMatch(newPassword, confirmPassword)}
+                disabled={
+                  !isPasswordValid ||
+                  !validatePasswordMatch(newPassword, confirmPassword)
+                }
               >
                 <Text style={styles.buttonText}>Reset Password</Text>
               </TouchableOpacity>
@@ -174,22 +194,56 @@ export default function ForgotPasswordScreen() {
           )}
 
           <TouchableOpacity onPress={handleNaviateLogin}>
-            <Text style={styles.backButtonLink}>Return to Login</Text>
+            <Text style={styles.linkText}>Return to Login</Text>
           </TouchableOpacity>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
+
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#fff" },
-  container: { flex: 1, paddingHorizontal: 24 },
-  section: { marginBottom: 32 },
-  title: { fontSize: 28, fontWeight: "600", textAlign: "center", marginBottom: 16 },
-  description: { fontSize: 14, color: "#555", marginBottom: 12 },
-  message: { textAlign: "center", marginBottom: 12, color: "#2D3047", fontWeight: "500" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+
+  container: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+
+  section: {
+    marginBottom: 32,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+
+  description: {
+    fontSize: 14,
+    color: "#555",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+
+  message: {
+    textAlign: "center",
+    marginBottom: 16,
+    color: "#2D3047",
+    fontWeight: "500",
+  },
+
+  error: {
+    color: "#a02626",
+    textAlign: "center",
+    marginBottom: 8,
+  },
 
   input: {
     height: 48,
@@ -200,23 +254,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  invalidEmail: {
-    color: "#a02626",
+  codeInput: {
+    height: 48,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 16,
     textAlign: "center",
-    marginBottom: 5,
-  },
-
-  backButton: {
-    color: "#7981c0",
-    textAlign: "center",
-    marginTop: 12,
-    fontSize: 16,
-  },
-
-  backButtonLink: {
-    color: "#7981c0",
-    textAlign: "center",
-    fontSize: 16,
+    fontSize: 18,
+    letterSpacing: 4,
   },
 
   inputContainer: {
@@ -229,15 +276,50 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  passwordInput: { flex: 1, paddingHorizontal: 12, height: "100%" },
-  passwordVisibilityButton: { paddingHorizontal: 12, justifyContent: "center", alignItems: "center" },
-  passwordConstraintsContainer: { marginBottom: 16 },
-  passwordConstraintsTitle: { fontSize: 14, color: "#555", marginBottom: 6 },
-  passwordRequirementRow: { flexDirection: "row", alignItems: "center", marginVertical: 2 },
-  passwordRequirementIcon: { width: 20, fontWeight: "bold" },
-  passwordRequirementText: { fontSize: 13 },
-  valid: { color: "#53a026" },
-  invalid: { color: "#a02626" },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 12,
+    height: "100%",
+  },
+
+  passwordVisibilityButton: {
+    paddingHorizontal: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  passwordConstraintsContainer: {
+    marginBottom: 16,
+  },
+
+  passwordConstraintsTitle: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 6,
+  },
+
+  passwordRequirementRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 2,
+  },
+
+  passwordRequirementIcon: {
+    width: 20,
+    fontWeight: "bold",
+  },
+
+  passwordRequirementText: {
+    fontSize: 13,
+  },
+
+  valid: {
+    color: "#53a026",
+  },
+
+  invalid: {
+    color: "#a02626",
+  },
 
   button: {
     backgroundColor: "#7981c0",
@@ -248,6 +330,19 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  disabledButton: { opacity: 0.6 },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  disabledButton: {
+    opacity: 0.6,
+  },
+
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  linkText: {
+    color: "#7981c0",
+    textAlign: "center",
+    fontSize: 16,
+  },
 });

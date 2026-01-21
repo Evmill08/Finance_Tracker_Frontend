@@ -1,11 +1,14 @@
 import { ApiResponse } from "@/models/AuthResponse";
 import {BASE_URL} from "config";
 
+// TODO: Figure out why this isnt hitting the endpoint
 export async function post<T>(
     path: string,
     body: any,
     token?: string
 ) : Promise<ApiResponse<T>> {
+    console.log("body: ", body);
+    console.log("token: ", token);
 
     const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -14,6 +17,8 @@ export async function post<T>(
     if (token){
         headers['Authorization'] = `Bearer ${token}`;
     }
+
+    console.log("headers: ", JSON.stringify(headers));
 
     console.log("Hitting: ", `${BASE_URL}${path}`);
     console.log("with body: ", JSON.stringify(body));
