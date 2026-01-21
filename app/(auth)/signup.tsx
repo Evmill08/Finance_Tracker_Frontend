@@ -14,6 +14,7 @@ export default function SignupScreen() {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const [emailError, setEmailError] = useState<string | null>(null);
     const [error, setError] = useState("");
 
     const isPasswordValid = PASSWORD_REQUIREMENTS.every(req => req.isValid(password));
@@ -27,6 +28,15 @@ export default function SignupScreen() {
             router.replace({pathname: "./verify-email", params: {email}});
         } else{
             setError(response.errorMessage ?? "Error signing up");
+        }
+    }
+
+    const handleSetEmail = (email: string) => {
+        setEmail(email);
+        if (!validateEmail(email)){
+            setEmailError("Invalid Email");
+        } else {
+            setEmailError(null);
         }
     }
 
@@ -68,8 +78,12 @@ export default function SignupScreen() {
                             autoCapitalize="none"
                             keyboardType="email-address"
                             value={email}
-                            onChangeText={setEmail}
+                            onChangeText={handleSetEmail}
                         />
+
+                        {emailError && (
+                            <Text style={styles.invalidEmail}>{emailError}</Text>
+                        )}
 
                         <View style={styles.inputContainer}>
                             <TextInput style={styles.passwordInput}
@@ -171,10 +185,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderWidth: 1,
         borderColor: "#ccc",
+        marginBottom: 5
     },
 
     loginButton: {
-        backgroundColor: "#2D3047",
+        backgroundColor: "#4b58cf",
         height: 48,
         borderRadius: 8,
         justifyContent: "center",
@@ -184,14 +199,15 @@ const styles = StyleSheet.create({
 
     buttonText: {
         color: "#fff",
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "600"
     },
 
     navigateLogin: {
-        color: "#2D3047",
+        color: "#7981c0",
         textAlign: "center",
-        marginTop: 12
+        marginTop: 12,
+        fontSize: 16
     },
 
     passwordConstraintsContainer: {
@@ -226,6 +242,12 @@ const styles = StyleSheet.create({
 
     invalid: {
         color: "#a02626",
+    },
+
+    invalidEmail: {
+        color: "#a02626",
+        textAlign: "center",
+        marginBottom: 5,
     },
 
     inputContainer: {

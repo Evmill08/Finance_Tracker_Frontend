@@ -16,6 +16,7 @@ export default function ForgotPasswordScreen() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const isPasswordValid = PASSWORD_REQUIREMENTS.every(req => req.isValid(newPassword));
 
@@ -42,6 +43,20 @@ export default function ForgotPasswordScreen() {
     }
   };
 
+  const handleSetEmail = (email: string) => {
+    setEmail(email);
+
+    if (!validateEmail(email)){
+      setEmailError("Invalid Email");
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  const handleNaviateLogin = () => {
+    router.replace("/(auth)/login");
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -57,14 +72,20 @@ export default function ForgotPasswordScreen() {
               <Text style={styles.description}>
                 Enter your email address to receive a password reset code
               </Text>
+
               <TextInput
                 style={styles.input}
                 placeholder="Email"
                 autoCapitalize="none"
                 keyboardType="email-address"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={handleSetEmail}
               />
+
+              {emailError && (
+                <Text style={styles.invalidEmail}>{emailError}</Text>
+              )}
+              
               <TouchableOpacity
                 style={[styles.button, !validateEmail(email) && styles.disabledButton]}
                 onPress={handleSendVerificationEmail}
@@ -151,6 +172,11 @@ export default function ForgotPasswordScreen() {
               </TouchableOpacity>
             </View>
           )}
+
+          <TouchableOpacity onPress={handleNaviateLogin}>
+            <Text style={styles.backButtonLink}>Return to Login</Text>
+          </TouchableOpacity>
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -164,6 +190,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: "600", textAlign: "center", marginBottom: 16 },
   description: { fontSize: 14, color: "#555", marginBottom: 12 },
   message: { textAlign: "center", marginBottom: 12, color: "#2D3047", fontWeight: "500" },
+
   input: {
     height: 48,
     borderRadius: 8,
@@ -172,6 +199,26 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     marginBottom: 12,
   },
+
+  invalidEmail: {
+    color: "#a02626",
+    textAlign: "center",
+    marginBottom: 5,
+  },
+
+  backButton: {
+    color: "#7981c0",
+    textAlign: "center",
+    marginTop: 12,
+    fontSize: 16,
+  },
+
+  backButtonLink: {
+    color: "#7981c0",
+    textAlign: "center",
+    fontSize: 16,
+  },
+
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -181,6 +228,7 @@ const styles = StyleSheet.create({
     height: 48,
     marginBottom: 12,
   },
+
   passwordInput: { flex: 1, paddingHorizontal: 12, height: "100%" },
   passwordVisibilityButton: { paddingHorizontal: 12, justifyContent: "center", alignItems: "center" },
   passwordConstraintsContainer: { marginBottom: 16 },
@@ -190,14 +238,16 @@ const styles = StyleSheet.create({
   passwordRequirementText: { fontSize: 13 },
   valid: { color: "#53a026" },
   invalid: { color: "#a02626" },
+
   button: {
-    backgroundColor: "#2D3047",
+    backgroundColor: "#7981c0",
     height: 48,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
   },
+
   disabledButton: { opacity: 0.6 },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });

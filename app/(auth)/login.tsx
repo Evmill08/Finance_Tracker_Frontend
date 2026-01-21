@@ -8,7 +8,6 @@ import * as SecureStore from 'expo-secure-store';
 import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginScreen() {
-    console.log("here");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -20,6 +19,7 @@ export default function LoginScreen() {
         if (response.success){
             const jwt = response.data as string;
             await setTokenFromVerification(jwt);
+            router.replace("./(app)"); // TODO: Figure this out
         } else {
             throw new Error(response.errorMessage);
         }
@@ -32,8 +32,6 @@ export default function LoginScreen() {
     const handleNaviateSignup = () => {
         router.push("./signup");
     }
-
-    // TODO: Add validation for email and password
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -85,7 +83,7 @@ export default function LoginScreen() {
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={handleNaviateSignup}>
-                        <Text style={styles.navigateSignup}>Don't have an account? Signup</Text>
+                        <Text style={styles.navigateSignup}>Create an account</Text>
                     </TouchableOpacity>
 
 
@@ -123,34 +121,38 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#ccc",
         borderRadius: 8,
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        marginBottom: 5,
     },
 
     loginButton: {
-        backgroundColor: "#2D3047",
+        backgroundColor: "#4b58cf",
         height: 48,
         borderRadius: 8,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 8
+        marginTop: 6,
+        marginBottom: 8
     },
 
     buttonText: {
         color: "#fff",
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "600"
     },
 
     forgotPasswordLink: {
-        color: "#2D3047",
+        color: "#7981c0",
         textAlign: "center",
-        marginTop: 12
+        marginTop: 12,
+        fontSize: 16,
     },
 
     navigateSignup: {
-        color: "#2D3047",
+        color: "#7981c0",
         textAlign: "center",
-        marginTop: 12
+        marginTop: 12,
+        fontSize: 16
     },
 
     inputContainer: {
