@@ -1,4 +1,4 @@
-import { post } from "@/utils/api";
+import { get } from "@/utils/api";
 import { ApiResponse } from "@/models/AuthResponse";
 import * as SecureStore from 'expo-secure-store';
 
@@ -6,5 +6,5 @@ import * as SecureStore from 'expo-secure-store';
 // Make sure our backend is accepting this
 export async function getUserInformation<T>(jwt: string): Promise<ApiResponse<T>> {
     console.log("Hitting me endpoint");
-    return await post<T>('/user-information', null, jwt);
+    return await get<T>('/user/user-information', jwt);
 }

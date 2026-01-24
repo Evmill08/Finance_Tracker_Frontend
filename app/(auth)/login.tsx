@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from 'expo-secure-store';
 import { useAuth } from "@/hooks/use-auth";
+import { User } from "@/models/User";
 
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
@@ -17,9 +18,16 @@ export default function LoginScreen() {
         const response = await login(email, password);
 
         if (response.success){
+            const userData = response.data as User;
             const JwtToken = response.data as string;
             await setTokenFromVerification(JwtToken);
-            router.replace("./(app)"); // TODO: Figure this out
+
+            if (userData.hasLinkedPlaid){
+                router.replace("/(app)");
+            } else {
+                router.replace("/(app)/link-bank")
+            }
+            
         } else {
             throw new Error(response.errorMessage);
         }

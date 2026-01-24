@@ -37,3 +37,35 @@ export async function post<T>(
 
     return await response.json()
 }
+
+export async function get<T>(
+    path: string,
+    token: string,
+): Promise<ApiResponse<T>> {
+
+    const headers: HeadersInit = {
+        "Content-Type": "application/json",
+    };
+
+    if (!token){
+        throw new Error(`Invalid JWT`);
+    }
+
+    headers['Authorization'] = `Bearer ${token}`;
+
+    console.log("headers: ", headers);
+
+    const response = await fetch(`${BASE_URL}${path}`, {
+        method: 'GET',
+        headers,
+    });
+
+    console.log("response from get: ", JSON.stringify(response));
+
+    if (!response.ok){
+        const text = await response.text();
+        throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+
+    return await response.json();
+}
