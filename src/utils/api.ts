@@ -1,7 +1,6 @@
 import { ApiResponse } from "@/models/AuthResponse";
 import {BASE_URL} from "config";
 
-// TODO: Figure out why this isnt hitting the endpoint
 export async function post<T>(
     path: string,
     body: any,
@@ -67,5 +66,7 @@ export async function get<T>(
         throw new Error(`HTTP ${response.status}: ${text}`);
     }
 
-    return await response.json();
+    var jsonResponse = await response.json();
+    console.log("jsonResponse from get: ", JSON.stringify(jsonResponse));
+    return jsonResponse;
 }

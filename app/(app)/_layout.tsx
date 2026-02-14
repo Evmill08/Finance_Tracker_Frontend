@@ -1,25 +1,32 @@
-import { Slot, router } from 'expo-router';
+import { Slot, router, usePathname } from 'expo-router';
 import { useAuth } from '@/hooks/use-auth';
-import { useEffect } from 'react';
+import { use, useEffect } from 'react';
 
 export default function AppLayout() {
   const { token, user, loading } = useAuth();
-
-  console.log("Were are in app layout");
+  const pathname = usePathname();
+  console.log("Were in the app layout");
 
   useEffect(() => {
-    if (!loading) {
-      if (!token) {
-        router.replace('./login');
-      } else if (!user?.hasLinkedPlaid) {
-        router.replace('./link-bank');
-      }
-    }
-  }, [loading, token, user]);
+    if (loading) return;
+    console.log("token: ", token);
+    console.log("user: ", user);
+    console.log("pathname: ", pathname);
 
-  if (loading || !token || !user?.hasLinkedPlaid) {
-    return null; 
-  }
+    if (!token && pathname !== '/login') {
+      router.replace('/login');
+      return;
+    }
+
+    if (user && !user.hasLinkedPlaid && pathname !== '/link-bank') {
+      console.log("User has not linked plaid, redirecting to link bank");
+      router.replace('/link-bank');
+    }
+  }, [loading, user, token, pathname]);
+
+  if (loading) return null;
+  if (!token) return null;
+  if (!user) return null;
 
   return <Slot />;
 }

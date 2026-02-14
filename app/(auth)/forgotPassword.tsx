@@ -37,7 +37,7 @@ export default function ForgotPasswordScreen() {
 
     if (response.success) {
       setMessage("Success! Redirecting to login...");
-      router.replace("./login");
+      router.replace("/login");
     } else {
       setMessage("Error validating your new password");
     }

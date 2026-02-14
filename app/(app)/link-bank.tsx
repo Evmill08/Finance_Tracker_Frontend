@@ -1,6 +1,6 @@
 import {create, LinkExit, LinkSuccess, open} from 'react-native-plaid-link-sdk';
-import { exchangeToken, getLinkToken } from '@/services/User/user.service';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { exchangeToken, getLinkToken } from '@/services/Plaid/plaid.service';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { router } from 'expo-router';
 import { LinkTokenModel } from '@/models/LinkToken';
@@ -8,12 +8,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
+// TODO: sending null link token for some reason
 export default function LinkBankScreen() {
     const {token: jwt, user} = useAuth();
     const [loading, setLoading] = useState<boolean>(false);
     const [plaidReady, setPlaidReady] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [linkToken, setLinkToken] = useState<string>("");
+    const linkTokenRef = useRef<string>("");
+
+    console.log("Were in the link bank screen");
 
     useEffect(() => {
         if (!jwt){
@@ -24,10 +27,13 @@ export default function LinkBankScreen() {
         const initPlaid = async () => {
             try {
                 setLoading(true);
+                console.log("getting link token with jwt: ", jwt);
 
                 const response = await getLinkToken(jwt);
+                console.log("response from get link token: ", JSON.stringify(response));
                 const linkToken = response.data as LinkTokenModel;
-                setLinkToken(linkToken.linkToken)
+                console.log("Link token: ", JSON.stringify(linkToken));
+                linkTokenRef.current = linkToken.linkToken;
 
                 const expiresAt = new Date(linkToken.expiresAt);
                 if (expiresAt <= new Date()){
@@ -62,7 +68,8 @@ export default function LinkBankScreen() {
 
     const handleSuccessfulLink = async () => {
         if (jwt){
-            const response = await exchangeToken(linkToken, jwt);
+            console.log("Handling successful link with link token: ", linkTokenRef.current, " and jwt: ", jwt);
+            const response = await exchangeToken(linkTokenRef.current, jwt);
 
             if (response.success){
                 const accessToken = response.data as string;

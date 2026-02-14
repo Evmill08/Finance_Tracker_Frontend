@@ -41,7 +41,7 @@ export default function SignupScreen() {
     }
 
     const handleNaviateLogin = () => {
-        router.replace("./login");
+        router.replace("/login");
     }
 
     // TODO: Add some kind of scroll feature to avoid confirm being off screen

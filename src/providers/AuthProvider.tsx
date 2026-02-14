@@ -22,8 +22,13 @@ export function AuthProvider({ children }: {children: ReactNode}) {
   // TODO: Should probably change (JSON web token Token) in FE and BE
   async function setTokenFromVerification(JwtToken: string){
     await SecureStore.setItemAsync("JwtToken", JwtToken);
-    setToken(JwtToken);
-    await refreshUser();
+
+    const response = await getUserInformation(JwtToken);
+
+    if (response.success){
+      setToken(JwtToken);
+      setUser(response.data as User);
+    }
   }
 
   async function loadAuth(){
