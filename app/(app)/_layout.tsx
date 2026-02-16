@@ -7,25 +7,27 @@ export default function AppLayout() {
   const pathname = usePathname();
   console.log("Were in the app layout");
 
-  useEffect(() => {
-    if (loading) return;
-    console.log("token: ", token);
-    console.log("user: ", user);
-    console.log("pathname: ", pathname);
-
-    if (!token && pathname !== '/login') {
-      router.replace('/login');
-      return;
-    }
-
-    if (user && !user.hasLinkedPlaid && pathname !== '/link-bank') {
-      console.log("User has not linked plaid, redirecting to link bank");
-      router.replace('/link-bank');
-    }
-  }, [loading, user, token, pathname]);
+  console.log("token: ", token);
+  console.log("user: ", user);
+  console.log("pathname: ", pathname);
 
   if (loading) return null;
-  if (!token) return null;
+
+  if (!token){
+    router.replace('/login');
+    return null;
+  }
+
+  if (user && !user.hasLinkedPlaid && pathname !== '/link-bank') {
+    console.log("User has not linked plaid, redirecting to link bank");
+    router.replace('/link-bank');
+  }
+
+  if (user && user.hasLinkedPlaid && pathname === '/link-bank') {
+    console.log("User has linked plaid, redirecting to home");
+    router.replace('/');
+  }
+
   if (!user) return null;
 
   return <Slot />;

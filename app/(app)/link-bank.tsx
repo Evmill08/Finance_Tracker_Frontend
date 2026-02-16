@@ -7,6 +7,7 @@ import { LinkTokenModel } from '@/models/LinkToken';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import { TokenExchangeResponse } from '@/models/TokenExchangeResponse';
 
 // TODO: sending null link token for some reason
 export default function LinkBankScreen() {
@@ -57,27 +58,50 @@ export default function LinkBankScreen() {
 
         open({
             onSuccess: async (_success: LinkSuccess) => {
-                await handleSuccessfulLink();
+                console.log("Successfully linked bank account: ", _success);
+                console.log("Public token: ", _success.publicToken);
+                await handleSuccessfulLink(_success.publicToken);
             },
             onExit: async (_exit: LinkExit) => {
                 // Retry
+                console.log("Exited Plaid Link: ", _exit);
                 await handleLinkExit(_exit);
             },
         });
     };
 
-    const handleSuccessfulLink = async () => {
-        if (jwt){
-            console.log("Handling successful link with link token: ", linkTokenRef.current, " and jwt: ", jwt);
-            const response = await exchangeToken(linkTokenRef.current, jwt);
-
-            if (response.success){
-                const accessToken = response.data as string;
-                await SecureStore.setItemAsync("accessToken", accessToken);
-                router.replace("/(app)");
+    const handleSuccessfulLink = async (publicToken: string) => {
+        try{
+            if (!jwt){
+                router.replace('/login');
+                return;
             }
-        } else {
-            router.replace('/(auth)/login');
+
+            const response = await exchangeToken(publicToken, jwt);
+            console.log("response from token exchange: ", JSON.stringify(response));
+
+            if (!response.success){
+                console.log("Exchange failed");
+                return;
+            }
+
+            console.log("Response data: ", JSON.stringify(response.data));
+
+            const exchangeResponse = response.data as TokenExchangeResponse;
+
+            console.log("AcessToken: ", exchangeResponse?.accessToken);
+            console.log("ItemId: ", exchangeResponse?.itemId);
+
+            if (!exchangeResponse?.accessToken || !exchangeResponse?.itemId){
+                console.log("Missing values from exchange response");
+                return;
+            }
+
+            await SecureStore.setItemAsync("accessToken", JSON.stringify(exchangeResponse.accessToken));
+            await SecureStore.setItemAsync("itemId", JSON.stringify(exchangeResponse.itemId));
+            router.replace("/(app)");
+        } catch (err){
+            console.error("Handle successful link error: ", err);
         }
     }
 
@@ -86,6 +110,12 @@ export default function LinkBankScreen() {
         console.log("Exited Link: ", exit);
     }
 
+    const handleLogOut = () => {
+        SecureStore.deleteItemAsync("JwtToken");
+        SecureStore.deleteItemAsync("accessToken");
+        SecureStore.deleteItemAsync("itemId");
+        router.replace("/login");
+    }
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -106,6 +136,10 @@ export default function LinkBankScreen() {
                         <Text style={styles.buttonText}>Link Bank</Text>
                     </TouchableOpacity>
                 )}
+
+                <TouchableOpacity style={styles.logoutButton} onPress={handleLogOut} disabled={loading}>
+                    <Text style={styles.logoutButtonText}>Logout</Text>
+                </TouchableOpacity>
             </KeyboardAvoidingView>
         </SafeAreaView>
   );
@@ -144,6 +178,21 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+
+  logoutButton: {
+    marginTop: 16,
+    backgroundColor: '#ccc',
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  logoutButtonText: {
+    color: '#000',
     fontSize: 18,
     fontWeight: '600',
   },

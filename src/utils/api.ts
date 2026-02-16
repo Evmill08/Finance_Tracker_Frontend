@@ -63,7 +63,7 @@ export async function get<T>(
 
     if (!response.ok){
         const text = await response.text();
-        throw new Error(`HTTP ${response.status}: ${text}`);
+        return {success: false, data: null as any, errorMessage: `HTTP ${response.status}: ${text}`};
     }
 
     var jsonResponse = await response.json();

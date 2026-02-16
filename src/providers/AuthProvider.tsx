@@ -2,6 +2,7 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import { getUserInformation } from "@/services/User/user.service";
 import { User } from "@/models/User";
 import * as SecureStore from 'expo-secure-store';
+import { router } from "expo-router";
 
 type AuthContextType = {
     token: string | null;
@@ -28,6 +29,11 @@ export function AuthProvider({ children }: {children: ReactNode}) {
     if (response.success){
       setToken(JwtToken);
       setUser(response.data as User);
+    } else {
+      await SecureStore.deleteItemAsync("JwtToken");
+      setToken(null);
+      setUser(null);
+      router.replace("/(auth)/login");
     }
   }
 
@@ -52,6 +58,7 @@ export function AuthProvider({ children }: {children: ReactNode}) {
             await SecureStore.deleteItemAsync("JwtToken");
             setToken(null);
             setUser(null);
+            router.replace("/(auth)/login");
         }
     } finally {
         setLoading(false);

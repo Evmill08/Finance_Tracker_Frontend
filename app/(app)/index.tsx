@@ -47,7 +47,5 @@
 export default function HomeScreen() {
     console.log("Were in the home screen");
     
-    return (
-        {}
-    )
+    return null;
 }
