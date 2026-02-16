@@ -97,8 +97,8 @@ export default function LinkBankScreen() {
                 return;
             }
 
-            await SecureStore.setItemAsync("accessToken", JSON.stringify(exchangeResponse.accessToken));
-            await SecureStore.setItemAsync("itemId", JSON.stringify(exchangeResponse.itemId));
+            await SecureStore.setItemAsync("accessToken", exchangeResponse.accessToken);
+            await SecureStore.setItemAsync("itemId", exchangeResponse.itemId);
             router.replace("/(app)");
         } catch (err){
             console.error("Handle successful link error: ", err);

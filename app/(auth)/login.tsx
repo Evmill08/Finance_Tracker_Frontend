@@ -84,7 +84,6 @@ export default function LoginScreen() {
                         <Text style={styles.buttonText}>Login</Text>
                     </TouchableOpacity>
 
-                    {/* TODO: Figure out email service to change password */}
                     <TouchableOpacity onPress={handleForgotPassword}>
                         <Text style={styles.forgotPasswordLink}>Forgot Password?</Text>
                     </TouchableOpacity>
